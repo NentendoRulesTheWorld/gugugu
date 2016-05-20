@@ -1,7 +1,11 @@
+--global config value
+_width = 80
+_height = 48
+
 function love.conf(t)
-	t.title = "Scrolling Shooter Tutorial"
-	t.window.width = 800
-	t.window.height = 480
+	t.title = "gugugu"
+	t.window.width = _width
+	t.window.height = _height
 
 	t.console = true
 end
