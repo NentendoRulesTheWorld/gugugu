@@ -1,6 +1,7 @@
 require ("conf")
 require ("bar")
 
+isdestroy = false
 --LOVE2D original callback functions start
 function love.load(arg)--called before game start, only once
 	print(_width)
@@ -46,8 +47,10 @@ function love.draw()
 	-- love.graphics.rotate(angle)
 	-- love.graphics.translate(-_width/2, -_height/2)
 
-	love.graphics.setColor(72, 160, 14) 
-  	love.graphics.polygon("fill", objects.ground.body:getWorldPoints(objects.ground.shape:getPoints()))
+	if not isdestroy then
+		love.graphics.setColor(72, 160, 14) 
+  		love.graphics.polygon("fill", objects.ground.body:getWorldPoints(objects.ground.shape:getPoints()))
+	end
 
 	love.graphics.setColor(193, 47, 14) 
   	love.graphics.circle("fill", objects.ball.body:getX(), objects.ball.body:getY(), objects.ball.shape:getRadius())
@@ -62,7 +65,7 @@ end
 function love.update(dt)--dt the time between function called
 	world:update(dt)
 
-	print(objects.ball.body:getX(),objects.ball.body:getY())
+	-- print(objects.ball.body:getX(),objects.ball.body:getY())
 	-- love.timer.sleep(.01)
 	
 	keyboardDown()
@@ -79,10 +82,17 @@ function keyboardDown()
 		print("r")
 		objects.ball.body:applyForce(-400, 0)
 	elseif love.keyboard.isDown('up','w') then
-		print("r")
+		print("u")
 		objects.ball.body:applyForce(0, 400)
 	elseif love.keyboard.isDown('down','s') then
-		print("r")
+		print("d")
 		objects.ball.body:applyForce(0, -400)
+	elseif love.keyboard.isDown('r') then
+		print("destroy")
+		if not isdestroy then
+			isdestroy = true
+			objects.ground.body:setActive(false)--important
+			objects.ground.body:destroy()
+		end
 	end
 end
