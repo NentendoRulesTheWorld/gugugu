@@ -1,13 +1,15 @@
 require ("conf")
 require ("bar")
 
+--init value
 isdestroy = false
+net_state = "default"
+
 --LOVE2D original callback functions start
 function love.load(arg)--called before game start, only once
 	print(_width)
 	print(_height)
 
-	--global objects
 	testbar1 = barGenerater:new()
 	testbar2 = barGenerater:new()
 	testbar2:init()
@@ -58,8 +60,9 @@ function love.draw()
   	-- love.graphics.setColor(50, 50, 50) 
   	-- love.graphics.polygon("fill", objects.block1.body:getWorldPoints(objects.block1.shape:getPoints()))
   	-- love.graphics.polygon("fill", objects.block2.body:getWorldPoints(objects.block2.shape:getPoints()))
-
-	testbar1:draw()
+  	if net_state == "server" then
+		testbar1:draw()
+	end
 end
  
 function love.update(dt)--dt the time between function called
@@ -93,6 +96,28 @@ function keyboardDown()
 			isdestroy = true
 			objects.ground.body:setActive(false)--important
 			objects.ground.body:destroy()
+		end
+	elseif love.keyboard.isDown('t') then
+		print("thread")
+		if net_state == "server" then
+			print("pop end"..channel:pop())
+		elseif net_state == "client" then
+			print("push start")
+			channel:push("push in")
+		end
+	elseif love.keyboard.isDown('[') then
+		if net_state == "default" then
+			net_state = "server"
+			thread = love.thread.newThread("server.lua")
+   			channel = love.thread.getChannel("server")
+   			thread:start()
+		end
+	elseif love.keyboard.isDown(']') then
+		if net_state == "default" then
+			net_state = "client"
+			thread = love.thread.newThread("client.lua")
+   			channel = love.thread.getChannel("client")
+   			thread:start()
 		end
 	end
 end

@@ -19,25 +19,25 @@ local conn_count = 0
 -- print(unpack(GetAdd(socket.dns.gethostname())))
 -- print(unpack(GetAdd('localhost')))
 
+channel = love.thread.getChannel("server")
 print("Server Start " .. host .. ":" .. port) 
- 
 while 1 do
     local conn = server:accept()
     if conn then
         conn_count = conn_count + 1
         client_tab[conn_count] = conn
-        print(conn:getsockname())--get connection infomation
+        print(conn:getpeername())
         print("A client successfully connect!") 
     end
-  
     for conn_count, client in pairs(client_tab) do
         local recvt, sendt, status = socket.select({client}, nil, 1)
         if #recvt > 0 then
             local receive, receive_status = client:receive()
             if receive_status ~= "closed" then
                 if receive then
+                    print("server get"..receive)
+                    channel:push(receive)
                     for conn_count_, client_ in pairs(client_tab) do
-                        print(""..conn_count_)
                         assert(client_:send("Client " .. conn_count_ .. " Send : "))
                         assert(client_:send(receive .. "\n"))
                     end
