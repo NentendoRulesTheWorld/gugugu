@@ -1,7 +1,6 @@
 require ("conf")
 require ("bar")
 require ("objects")
--- require ("objectsContainer")
 
 --LOVE2D original callback functions start
 function love.load(arg)--called before game start, only once
@@ -18,7 +17,8 @@ function love.load(arg)--called before game start, only once
 	player = objectsGenerater:new()
 	function player:init(w)
 		self.body = love.physics.newBody(w, _width/2, _height/2, "dynamic")
-		self.body:setLinearDamping(1)
+		self.body:setLinearDamping(4)
+		self.body:setAngularDamping(8)
 		self.shape = love.physics.newCircleShape(5)
 		self.fixture = love.physics.newFixture(self.body, self.shape, 1)
 		self.fixture:setRestitution(0.7)
@@ -27,17 +27,22 @@ function love.load(arg)--called before game start, only once
 	function player:draw()
 		love.graphics.setColor(193, 47, 14) 
   		love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.shape:getRadius())
+  		love.graphics.setColor(0, 0, 0) 
+  		--draw the direction
+  		love.graphics.line( self.body:getX(), self.body:getY(), 
+  			self.body:getX() + math.cos(self.body:getAngle())*self.shape:getRadius(), 
+  				self.body:getY() + math.sin(self.body:getAngle())*self.shape:getRadius())
 	end
 	function player:update()
 		if love.keyboard.isDown('left','a') then
-			player.body:applyForce(400, 0)
+			player.body:applyAngularImpulse(-20)
 		elseif love.keyboard.isDown('right','d') then
-			player.body:applyForce(-400, 0)
+			player.body:applyAngularImpulse(20)
 		end
 		if love.keyboard.isDown('up','w') then
-			player.body:applyForce(0, 400)
+			player.body:applyForce(math.cos(self.body:getAngle())*400, math.sin(self.body:getAngle())*400)
 		elseif love.keyboard.isDown('down','s') then
-			player.body:applyForce(0, -400)
+			player.body:applyForce(math.cos(self.body:getAngle())*-400, math.sin(self.body:getAngle())*-400)
 		end
 	end
 	player:init(world)
